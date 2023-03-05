@@ -19,7 +19,6 @@ flex-wrap: wrap;
   flex-direction: column;
   justify-content: space-around;
   margin: 2px;
-
 }
 
 .card img {
@@ -34,4 +33,9 @@ flex-wrap: wrap;
 
 .card p:last-child{  
   transform: rotate(180deg);
+}
+
+.back{
+  background: url("https://assets-lighthouse.alphacamp.co/uploads/image/file/9222/ExportedContentImage_00.png");
+  background-size: cover;
 }
