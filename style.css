@@ -6,13 +6,15 @@
 
 
 #cards{
+  width: 85%;
 display: flex;
 flex-wrap: wrap;
+margin: 0 auto;
 
 }
 
 .card{
-  flex: 7% 0 1;
+  flex: 7% 1 1;
   height: 8vw;
   border: 2px solid #e0e0e0;
   display: flex;
@@ -42,4 +44,37 @@ flex-wrap: wrap;
 
 .paired{
   background-color: #dae0e3;
+}
+
+#header {
+  display: flex;
+  margin: 20px auto;
+  flex-direction: column;
+  width: 85%;
+  align-items: end;
+}
+
+#header .title{
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+#header .title img{
+  max-width: 3em;
+}
+
+#header .title h2{
+padding-left: 0.5em;
+}
+
+.wrong {
+  animation: wrongAnimation 0.2s ;
+  animation-iteration-count: 5;
+}
+@keyframes wrongAnimation {
+  100% {
+    border: 2px solid #f1c232;
+  }
 }

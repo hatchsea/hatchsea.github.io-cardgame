@@ -67,6 +67,26 @@ const view = {
       card.classList.add("paired");
     });
   },
+  renderScore(score) {
+    document.querySelector(".score").textContent = `Score: ${score}`;
+  },
+  renderTriedTimes(times) {
+    document.querySelector(
+      ".tried"
+    ).textContent = `You've tried : ${times} times`;
+  },
+  appendWrongAnimation(...cards) {
+    cards.map((card) => {
+      card.classList.add("wrong");
+      card.addEventListener(
+        "animationend",
+        (e) => {
+          card.classList.remove("wrong");
+        },
+        { once: true }
+      );
+    });
+  },
 };
 const model = {
   revealedCards: [],
@@ -76,6 +96,8 @@ const model = {
       this.revealedCards[1].dataset.index % 13
     );
   },
+  score: 0,
+  triedTimes: 0,
 };
 
 const controller = {
@@ -96,16 +118,19 @@ const controller = {
         break;
 
       case GAME_STATE.SecondCardAwaits:
+        view.renderTriedTimes(++model.triedTimes);
         view.flipCards(card);
         model.revealedCards.push(card);
         if (model.isRevealedCardsMatched()) {
           // 配對成功
+          view.renderScore((model.score += 10));
           this.currentState = GAME_STATE.CardsMatched;
           view.pairCards(...model.revealedCards);
           model.revealedCards = [];
           this.currentState = GAME_STATE.FirstCardAwaits;
         } else {
           // 配對失敗
+          view.appendWrongAnimation(...model.revealedCards);
           this.currentState = GAME_STATE.CardsMatchFailed;
           setTimeout(this.resetCards, 1000);
         }
