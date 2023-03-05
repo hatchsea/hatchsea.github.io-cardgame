@@ -1,3 +1,12 @@
+// 狀態機
+const GAME_STATE = {
+  FirstCardAwaits: "FirstCardAwaits",
+  SecondCardAwaits: "SecondCardAwaits",
+  CardsMatchFailed: "CardsMatchFailed",
+  CardsMatched: "CardsMatched",
+  GameFinished: "GameFinished",
+};
+
 const Symbols = [
   "https://assets-lighthouse.alphacamp.co/uploads/image/file/17989/__.png", // 黑桃
   "https://assets-lighthouse.alphacamp.co/uploads/image/file/17992/heart.png", // 愛心
@@ -20,10 +29,9 @@ const view = {
       <p>${number}</p>`;
   },
 
-  displayCards() {
+  displayCards(indexes) {
     const rootElement = document.querySelector("#cards");
-    rootElement.innerHTML = utility
-      .getRandomNumberArray(52)
+    rootElement.innerHTML = indexes
       .map((index) => this.getCardElement(index))
       .join("");
   },
@@ -52,6 +60,63 @@ const view = {
     card.classList.add("back");
     card.innerHTML = null;
   },
+  pairCard(card) {
+    card.classList.add("paired");
+  },
+};
+const model = {
+  revealedCards: [],
+  isRevealedCardsMatched() {
+    return (
+      this.revealedCards[0].dataset.index % 13 ===
+      this.revealedCards[1].dataset.index % 13
+    );
+  },
+};
+
+const controller = {
+  currentState: GAME_STATE.FirstCardAwaits,
+  generateCards() {
+    view.displayCards(utility.getRandomNumberArray(52));
+  },
+  dispatchCardAction(card) {
+    if (!card.classList.contains("back")) {
+      return;
+    }
+    switch (this.currentState) {
+      case GAME_STATE.FirstCardAwaits:
+        view.flipCard(card);
+        model.revealedCards.push(card);
+
+        this.currentState = GAME_STATE.SecondCardAwaits;
+        break;
+
+      case GAME_STATE.SecondCardAwaits:
+        view.flipCard(card);
+        model.revealedCards.push(card);
+        if (model.isRevealedCardsMatched()) {
+          // 配對成功
+          this.currentState = GAME_STATE.CardsMatched;
+          view.pairCard(model.revealedCards[0]);
+          view.pairCard(model.revealedCards[1]);
+          model.revealedCards = [];
+          this.currentState = GAME_STATE.FirstCardAwaits;
+        } else {
+          // 配對失敗
+          this.currentState = GAME_STATE.CardsMatchFailed;
+          setTimeout(() => {
+            view.flipCard(model.revealedCards[0]);
+            view.flipCard(model.revealedCards[1]);
+            model.revealedCards = [];
+            this.currentState = GAME_STATE.FirstCardAwaits;
+          }, 1000);
+        }
+
+        break;
+    }
+    console.log("revealedCards =", model.revealedCards);
+    console.log("currentState = ", this.currentState);
+  },
 };
 
 const utility = {
@@ -68,10 +133,10 @@ const utility = {
   },
 };
 
-view.displayCards();
+controller.generateCards();
 
 document.querySelectorAll(".card").forEach((card) => {
   card.addEventListener("click", (event) => {
-    view.flipCard(card);
+    controller.dispatchCardAction(card);
   });
 });
