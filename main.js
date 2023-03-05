@@ -49,19 +49,23 @@ const view = {
         return number;
     }
   },
-  flipCard(card) {
-    if (card.classList.contains("back")) {
-      // 回傳正面
-      card.classList.remove("back");
-      card.innerHTML = this.getCardContent(card.dataset.index);
-      return;
-    }
-    // 回傳背面
-    card.classList.add("back");
-    card.innerHTML = null;
+  flipCards(...cards) {
+    cards.map((card) => {
+      if (card.classList.contains("back")) {
+        // 回傳正面
+        card.classList.remove("back");
+        card.innerHTML = this.getCardContent(card.dataset.index);
+        return;
+      }
+      // 回傳背面
+      card.classList.add("back");
+      card.innerHTML = null;
+    });
   },
-  pairCard(card) {
-    card.classList.add("paired");
+  pairCards(...cards) {
+    cards.map((card) => {
+      card.classList.add("paired");
+    });
   },
 };
 const model = {
@@ -85,37 +89,37 @@ const controller = {
     }
     switch (this.currentState) {
       case GAME_STATE.FirstCardAwaits:
-        view.flipCard(card);
+        view.flipCards(card);
         model.revealedCards.push(card);
 
         this.currentState = GAME_STATE.SecondCardAwaits;
         break;
 
       case GAME_STATE.SecondCardAwaits:
-        view.flipCard(card);
+        view.flipCards(card);
         model.revealedCards.push(card);
         if (model.isRevealedCardsMatched()) {
           // 配對成功
           this.currentState = GAME_STATE.CardsMatched;
-          view.pairCard(model.revealedCards[0]);
-          view.pairCard(model.revealedCards[1]);
+          view.pairCards(...model.revealedCards);
           model.revealedCards = [];
           this.currentState = GAME_STATE.FirstCardAwaits;
         } else {
           // 配對失敗
           this.currentState = GAME_STATE.CardsMatchFailed;
-          setTimeout(() => {
-            view.flipCard(model.revealedCards[0]);
-            view.flipCard(model.revealedCards[1]);
-            model.revealedCards = [];
-            this.currentState = GAME_STATE.FirstCardAwaits;
-          }, 1000);
+          setTimeout(this.resetCards, 1000);
         }
 
         break;
     }
     console.log("revealedCards =", model.revealedCards);
     console.log("currentState = ", this.currentState);
+  },
+
+  resetCards() {
+    view.flipCards(...model.revealedCards);
+    model.revealedCards = [];
+    controller.currentState = GAME_STATE.FirstCardAwaits;
   },
 };
 
