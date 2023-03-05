@@ -87,6 +87,17 @@ const view = {
       );
     });
   },
+  showGameFinished() {
+    const completedShow = document.createElement("div");
+    completedShow.classList.add("completed");
+    completedShow.innerHTML = `
+        <p>Complete!</p>
+      <p>Score: ${model.score}</p>
+      <p>You've tried: ${model.triedTimes} times</p>
+    `;
+    const header = document.querySelector("#header");
+    header.before(completedShow);
+  },
 };
 const model = {
   revealedCards: [],
@@ -127,6 +138,11 @@ const controller = {
           this.currentState = GAME_STATE.CardsMatched;
           view.pairCards(...model.revealedCards);
           model.revealedCards = [];
+          if (model.score === 260) {
+            this.currentState = GAME_STATE.GameFinished;
+            view.showGameFinished();
+            return;
+          }
           this.currentState = GAME_STATE.FirstCardAwaits;
         } else {
           // 配對失敗
@@ -137,7 +153,10 @@ const controller = {
 
         break;
     }
-    console.log("revealedCards =", model.revealedCards);
+    console.log(
+      "revealedCards =",
+      model.revealedCards.map((card) => card.dataset.index)
+    );
     console.log("currentState = ", this.currentState);
   },
 

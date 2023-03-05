@@ -78,3 +78,23 @@ padding-left: 0.5em;
     border: 2px solid #f1c232;
   }
 }
+
+.completed {
+  background-color: rgba(101, 38, 11, 0.8);
+  width: 100vw;
+padding: 50px;
+  position: absolute;
+  top: 33vh;
+  
+}
+
+.completed > p{
+  font-size: 1.5em;
+  color: #fff;
+  text-align: center;
+}
+
+.completed > p:first-child{
+  font-size: 3em;
+  font-weight: 700;
+}
